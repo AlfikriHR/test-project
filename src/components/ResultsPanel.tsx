@@ -5,6 +5,7 @@ import {
   formatHours,
 } from "../lib/calculate";
 import { Card } from "./ui/card";
+import { Button } from "./ui/button";
 import { cn } from "../lib/utils";
 
 interface ResultsPanelProps {
@@ -16,6 +17,7 @@ interface ResultsPanelProps {
 
 export const ResultsPanel: React.FC<ResultsPanelProps> = ({
   results,
+  onOpenConsultation,
   onReset,
   isDirty = false,
 }) => {
@@ -193,6 +195,36 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
           })}
         </div>
       </div>
+
+      {/* Action CTA */}
+      {onOpenConsultation && (
+        <div className="pt-2">
+          <Button
+            type="button"
+            onClick={onOpenConsultation}
+            className="w-full justify-center bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-2.5 px-4 rounded-md shadow-xs transition-all duration-200 cursor-pointer flex items-center gap-2 group text-sm h-auto"
+          >
+            <span>Book Strategy Consultation</span>
+            <svg
+              className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+              />
+            </svg>
+          </Button>
+          <p className="text-[11px] text-center text-slate-500 mt-2">
+            Claim your tailored automation blueprint
+          </p>
+        </div>
+      )}
 
       {/* Legal compliance disclaimer */}
       <div className="border-t border-slate-100 pt-3">

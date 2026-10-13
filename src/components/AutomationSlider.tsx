@@ -57,7 +57,11 @@ export const AutomationSlider: React.FC<AutomationSliderProps> = ({
     <div className="rounded-md border border-slate-200 bg-slate-50/40 p-3.5 sm:p-4 lg:p-5 shadow-2xs">
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Label id={labelId} htmlFor={id} className="text-xs font-semibold text-slate-900 cursor-pointer">
+          <Label
+            id={labelId}
+            htmlFor={id}
+            className="text-xs font-semibold text-slate-900 cursor-pointer whitespace-nowrap"
+          >
             {label}
           </Label>
           {helperText && !error && (
@@ -92,7 +96,8 @@ export const AutomationSlider: React.FC<AutomationSliderProps> = ({
             aria-describedby={describedBy || undefined}
             className={cn(
               "h-8 w-14 sm:w-16 rounded-md border border-slate-200 bg-white px-1.5 sm:px-2 py-0.5 text-right text-xs font-semibold tabular-nums shadow-2xs focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20",
-              hasError && "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+              hasError &&
+                "border-red-400 focus:border-red-500 focus:ring-red-500/20",
             )}
           />
           <span className="text-xs font-medium text-slate-700">%</span>
@@ -103,12 +108,19 @@ export const AutomationSlider: React.FC<AutomationSliderProps> = ({
       {(error || warning) && (
         <div className="mt-1 text-xs">
           {error && (
-            <p id={errorId} className="font-medium text-red-600 text-[11px]" role="alert">
+            <p
+              id={errorId}
+              className="font-medium text-red-600 text-[11px]"
+              role="alert"
+            >
               {error}
             </p>
           )}
           {warning && !error && (
-            <p id={warningId} className="font-medium text-amber-700 text-[11px]">
+            <p
+              id={warningId}
+              className="font-medium text-amber-700 text-[11px]"
+            >
               {warning}
             </p>
           )}
@@ -130,4 +142,3 @@ export const AutomationSlider: React.FC<AutomationSliderProps> = ({
     </div>
   );
 };
-
