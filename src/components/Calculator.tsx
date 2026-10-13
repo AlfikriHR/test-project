@@ -8,7 +8,7 @@ import {
   InputKey,
 } from "../lib/calculate";
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
-import { InputField } from "./InputField";
+import { InputField, normalizeNumericInput } from "./InputField";
 import { AutomationSlider } from "./AutomationSlider";
 import { ResultsPanel } from "./ResultsPanel";
 import { ConsultationModal } from "./ConsultationModal";
@@ -31,7 +31,7 @@ export const Calculator: React.FC = () => {
   const handleInputChange = (key: InputKey, val: string) => {
     setInputs((prev) => ({
       ...prev,
-      [key]: val,
+      [key]: normalizeNumericInput(val),
     }));
   };
 

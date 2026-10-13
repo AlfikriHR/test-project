@@ -21,6 +21,17 @@ interface InputFieldProps {
   onWheel?: (e: React.WheelEvent<HTMLInputElement>) => void;
 }
 
+export function normalizeNumericInput(value: string): string {
+  const cleaned = value.replace(/-/g, "").trim();
+  if (cleaned === "" || cleaned === "NaN") {
+    return "0";
+  }
+  if (/^0\d/.test(cleaned)) {
+    return cleaned.replace(/^0+(?=\d)/, "");
+  }
+  return cleaned;
+}
+
 export const InputField: React.FC<InputFieldProps> = ({
   id,
   label,
@@ -84,6 +95,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           id={id}
           name={id}
           type="number"
+          inputMode="decimal"
           min={min}
           max={max}
           step={step}
@@ -93,7 +105,14 @@ export const InputField: React.FC<InputFieldProps> = ({
               e.preventDefault();
             }
           }}
-          onChange={(e) => onChange(e.target.value.replace(/-/g, ""))}
+          onFocus={(e) => {
+            const target = e.currentTarget;
+            target.select();
+            requestAnimationFrame(() => {
+              target.select();
+            });
+          }}
+          onChange={(e) => onChange(normalizeNumericInput(e.target.value))}
           onWheel={handleWheel}
           placeholder={placeholder}
           aria-invalid={hasError ? "true" : "false"}

@@ -3,6 +3,7 @@ import { Slider } from "./ui/slider";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { cn } from "../lib/utils";
+import { normalizeNumericInput } from "./InputField";
 
 interface AutomationSliderProps {
   id: string;
@@ -43,7 +44,7 @@ export const AutomationSlider: React.FC<AutomationSliderProps> = ({
   const hasError = Boolean(error);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value.replace(/-/g, ""));
+    onChange(normalizeNumericInput(e.target.value));
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -71,11 +72,19 @@ export const AutomationSlider: React.FC<AutomationSliderProps> = ({
           <Input
             id={`${id}-number`}
             type="number"
+            inputMode="numeric"
             min={0}
             max={100}
             step={1}
             value={value}
             onKeyDown={handleInputKeyDown}
+            onFocus={(e) => {
+              const target = e.currentTarget;
+              target.select();
+              requestAnimationFrame(() => {
+                target.select();
+              });
+            }}
             onChange={handleInputChange}
             aria-labelledby={labelId}
             aria-label="Automation percentage input"

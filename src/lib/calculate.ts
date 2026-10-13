@@ -72,7 +72,6 @@ export function parseAndValidateField(
   if (rawVal === undefined || rawVal === null || (typeof rawVal === "string" && rawVal.trim() === "")) {
     return {
       sanitizedValue: 0,
-      helper: "Treated as 0",
     };
   }
 
