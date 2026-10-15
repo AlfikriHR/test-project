@@ -17,7 +17,7 @@ export const UI_SLIDER_RANGES: Record<string, SliderRangeConfig> = {
   activeClients: { min: 50, mid: 1275, max: 2500, step: 25 },
   docRequestsPerClient: { min: 1, mid: 12, max: 24, step: 1 },
   minutesPerDocRequest: { min: 1, mid: 30, max: 60, step: 1, tickUnit: "min" },
-  followUpsPerRequest: { min: 0, mid: 5, max: 10, step: 0.5 },
+  followUpsPerRequest: { min: 0, mid: 5, max: 10, step: 1 },
   minutesPerFollowUp: { min: 1, mid: 10, max: 20, step: 1, tickUnit: "min" },
   hourlyRate: { min: 15, mid: 82, max: 150, step: 1, tickPrefix: "$" },
   automationPercentage: { min: 0, mid: 50, max: 100, step: 1, tickUnit: "%" },
@@ -42,7 +42,7 @@ export interface InputFieldProps {
 }
 
 export function normalizeNumericInput(value: string): string {
-  const cleaned = value.replace(/-/g, "").trim();
+  const cleaned = value.replace(/-/g, "").replace(/,/g, ".").trim();
   if (cleaned === "" || cleaned === "NaN") {
     return "0";
   }
@@ -120,17 +120,35 @@ export const InputField: React.FC<InputFieldProps> = ({
 
   const hasError = Boolean(error);
 
+  const effectiveStep = step ?? config.step ?? 1;
+  const isInteger = Number.isInteger(Number(effectiveStep));
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
     if (raw === "") {
       onChange("");
       return;
     }
-    onChange(normalizeNumericInput(raw));
+    const normalized = normalizeNumericInput(raw);
+    if (isInteger && normalized.includes(".")) {
+      onChange(normalized.split(".")[0] || "0");
+      return;
+    }
+    onChange(normalized);
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "-" || e.key === "Minus") {
+    if (
+      e.key === "-" ||
+      e.key === "Minus" ||
+      e.key === "+" ||
+      e.key === "e" ||
+      e.key === "E"
+    ) {
+      e.preventDefault();
+      return;
+    }
+    if (isInteger && (e.key === "." || e.key === "," || e.key === "Decimal")) {
       e.preventDefault();
     }
   };
@@ -168,8 +186,8 @@ export const InputField: React.FC<InputFieldProps> = ({
             id={`${id}-input`}
             name={id}
             type="number"
-            inputMode="decimal"
-            step={step ?? config.step ?? "any"}
+            inputMode={isInteger ? "numeric" : "decimal"}
+            step={effectiveStep}
             value={value}
             onKeyDown={handleInputKeyDown}
             onFocus={(e) => {

@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import Home from "./page";
 
 describe("Home Page Integration", () => {
@@ -51,5 +51,30 @@ describe("Home Page Integration", () => {
     expect(json["@type"]).toBe("WebApplication");
     expect(json.creator.name).toBe("White Code Labs");
     expect(json.publisher.name).toBe("White Code Labs");
+  });
+
+  it("verifies follow-ups per request input and slider have integer step", () => {
+    const { container } = render(<Home />);
+
+    const input = container.querySelector<HTMLInputElement>(
+      "#followUpsPerRequest-input"
+    );
+    expect(input).not.toBeNull();
+    expect(input?.getAttribute("step")).toBe("1");
+    expect(input?.getAttribute("inputmode")).toBe("numeric");
+
+    const preventDot = fireEvent.keyDown(input!, { key: "." });
+    expect(preventDot).toBe(false);
+
+    const preventComma = fireEvent.keyDown(input!, { key: "," });
+    expect(preventComma).toBe(false);
+
+    const slider = container.querySelector<HTMLInputElement>(
+      "#followUpsPerRequest"
+    );
+    expect(slider).not.toBeNull();
+    expect(slider?.getAttribute("step")).toBe("1");
+    expect(slider?.getAttribute("min")).toBe("0");
+    expect(slider?.getAttribute("max")).toBe("10");
   });
 });

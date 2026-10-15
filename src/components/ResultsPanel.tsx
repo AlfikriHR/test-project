@@ -28,10 +28,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
     breakdown,
   } = results;
 
-  const maxBaseline = Math.max(
-    ...breakdown.map((b) => b.baselineHours),
-    1
-  );
+  const maxBaseline = Math.max(...breakdown.map((b) => b.baselineHours), 1);
 
   return (
     <Card className="rounded-2xl border border-slate-100 bg-white shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-5 sm:p-6 space-y-6 sm:space-y-7 lg:sticky lg:top-8">
@@ -50,7 +47,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
                 "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-[#0C74BC]/25 shrink-0 select-none",
                 isDirty
                   ? "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 cursor-pointer shadow-2xs"
-                  : "border-slate-200/60 bg-slate-50/50 text-slate-400 cursor-not-allowed opacity-60"
+                  : "border-slate-200/60 bg-slate-50/50 text-slate-400 cursor-not-allowed opacity-60",
               )}
               title={
                 isDirty
@@ -77,7 +74,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
           )}
         </div>
 
-        <div className="mt-3 mb-1.5 text-4xl sm:text-[44px] lg:text-5xl font-extrabold font-display text-emerald-600 tabular-nums tracking-tight leading-none">
+        <div className="mt-4 mb-3 text-4xl sm:text-[44px] lg:text-5xl font-extrabold font-display text-emerald-600 tabular-nums tracking-tight leading-none">
           {formatCurrency(potentialLaborCostValue)}
         </div>
 
@@ -88,7 +85,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
         </p>
       </div>
 
-      <div className="border-b border-slate-100 my-3" />
+      <div className="border-b border-slate-100 my-1" />
 
       {/* Middle Section (Secondary Stats) */}
       <div className="space-y-4 py-1">
@@ -125,7 +122,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
         </div>
       </div>
 
-      <div className="border-b border-slate-100 my-3" />
+      <div className="border-b border-slate-100 my-1" />
 
       {/* Bottom Section (Workload Category Breakdown) */}
       <div className="space-y-4 pt-1">
@@ -151,21 +148,26 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
               maxBaseline > 0
                 ? Math.min(
                     100,
-                    Math.max(0, (item.baselineHours / maxBaseline) * 100)
+                    Math.max(0, (item.baselineHours / maxBaseline) * 100),
                   )
                 : 0;
             const recoveredRatio =
               item.baselineHours > 0
                 ? Math.min(
                     100,
-                    Math.max(0, (item.recoveredHours / item.baselineHours) * 100)
+                    Math.max(
+                      0,
+                      (item.recoveredHours / item.baselineHours) * 100,
+                    ),
                   )
                 : 0;
 
             return (
               <div key={item.id} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-xs sm:text-sm font-semibold text-slate-800">{item.label}</span>
+                  <span className="text-xs sm:text-sm font-semibold text-slate-800">
+                    {item.label}
+                  </span>
                   <span className="tabular-nums">
                     <span className="font-bold text-sm sm:text-base text-[#0C74BC]">
                       {formatHours(item.recoveredHours)} h
@@ -204,4 +206,3 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
     </Card>
   );
 };
-
