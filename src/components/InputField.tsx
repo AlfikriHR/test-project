@@ -42,7 +42,7 @@ export interface InputFieldProps {
 }
 
 export function normalizeNumericInput(value: string): string {
-  const cleaned = value.replace(/-/g, "").replace(/,/g, ".").trim();
+  const cleaned = value.replace(/[-eE]/g, "").replace(/,/g, ".").trim();
   if (cleaned === "" || cleaned === "NaN") {
     return "0";
   }
@@ -73,6 +73,8 @@ export const InputField: React.FC<InputFieldProps> = ({
   helperText,
   error,
   warning,
+  min,
+  max,
   step,
   placeholder,
   sliderConfig,
@@ -138,6 +140,9 @@ export const InputField: React.FC<InputFieldProps> = ({
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) {
+      return;
+    }
     if (
       e.key === "-" ||
       e.key === "Minus" ||
@@ -186,6 +191,8 @@ export const InputField: React.FC<InputFieldProps> = ({
             id={`${id}-input`}
             name={id}
             type="number"
+            min={min ?? sliderMin}
+            max={max}
             inputMode={isInteger ? "numeric" : "decimal"}
             step={effectiveStep}
             value={value}
@@ -223,7 +230,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           aria-label={`${label} slider`}
           aria-valuemin={sliderMin}
           aria-valuemax={sliderMax}
-          aria-valuenow={numericVal}
+          aria-valuenow={clampedSliderVal}
         />
       </div>
 
