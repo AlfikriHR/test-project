@@ -5,20 +5,25 @@ import {
   calculateSavings,
   DEFAULT_INPUTS,
   FIELD_LIMITS,
+  formatCurrency,
+  formatHours,
   InputKey,
 } from "../lib/calculate";
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import { Card } from "./ui/card";
 import { InputField, normalizeNumericInput } from "./InputField";
 import { AutomationSlider } from "./AutomationSlider";
 import { ResultsPanel } from "./ResultsPanel";
 import { ConsultationModal } from "./ConsultationModal";
 
-export const Calculator: React.FC = () => {
-  // Controlled form state initialized with default values as strings or numbers
+interface CalculatorProps {
+  assumptions?: React.ReactNode;
+}
+
+export const Calculator: React.FC<CalculatorProps> = ({ assumptions }) => {
   const [inputs, setInputs] = useState<Record<InputKey, string | number>>(
     () => ({
       ...DEFAULT_INPUTS,
-    }),
+    })
   );
 
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
@@ -44,246 +49,259 @@ export const Calculator: React.FC = () => {
     return keys.some((k) => String(inputs[k]) !== String(DEFAULT_INPUTS[k]));
   }, [inputs]);
 
+  const automationPercentageNum = Number(inputs.automationPercentage) || 0;
+
   return (
-    <div className="flex flex-col flex-1 w-full">
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Intro Section */}
-        <header className="mb-6 sm:mb-8">
-          <div className="rounded-md border border-slate-200 bg-white p-3.5 sm:p-4 lg:p-5 shadow-xs flex items-start gap-3 sm:gap-4">
-            <div
-              aria-hidden="true"
-              className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-600 border border-slate-200/60"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="1.75"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+    <div className="space-y-8 sm:space-y-10">
+      {/* Section 2: Two-column grid */}
+      <section
+        aria-label="Workflow Assessment Calculator"
+        className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] gap-6 lg:gap-8 items-start"
+      >
+        {/* Left Column: Your workflow figures Card */}
+        <Card className="rounded-2xl border border-slate-100 bg-white shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-5 sm:p-6 lg:p-7 space-y-6">
+          {/* Header of inputs card */}
+          <div className="pb-2 border-b border-slate-100">
+            <h2 className="text-xl sm:text-2xl font-bold font-display tracking-tight text-slate-900">
+              Your workflow figures
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+              Client intake, document collection, and reminder follow-ups.
+            </p>
+          </div>
+
+          {/* Group 1: Client intake & onboarding */}
+          <div className="bg-slate-50/70 border border-slate-200/70 rounded-xl p-4 sm:p-5 space-y-4">
+            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#0C74BC]" />
+              Client intake &amp; onboarding
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+              <InputField
+                id="newClients"
+                label="New clients per year"
+                value={inputs.newClients}
+                onChange={(val) => handleInputChange("newClients", val)}
+                unit="clients"
+                min={FIELD_LIMITS.newClients.min}
+                max={FIELD_LIMITS.newClients.max}
+                error={results.validations.newClients.error}
+                warning={results.validations.newClients.warning}
+                helperText="Annual volume of newly onboarded client accounts."
+              />
+
+              <InputField
+                id="onboardingMinutes"
+                label="Minutes per onboarding"
+                value={inputs.onboardingMinutes}
+                onChange={(val) => handleInputChange("onboardingMinutes", val)}
+                unit="min"
+                min={FIELD_LIMITS.onboardingMinutes.min}
+                max={FIELD_LIMITS.onboardingMinutes.max}
+                error={results.validations.onboardingMinutes.error}
+                warning={results.validations.onboardingMinutes.warning}
+                helperText="Average staff time spent on intake and account setup."
+              />
+            </div>
+          </div>
+
+          {/* Group 2: Document requests & follow-ups */}
+          <div className="bg-slate-50/70 border border-slate-200/70 rounded-xl p-4 sm:p-5 space-y-4">
+            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#0C74BC]" />
+              Document requests &amp; follow-ups
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+              <InputField
+                id="activeClients"
+                label="Active clients managed"
+                value={inputs.activeClients}
+                onChange={(val) => handleInputChange("activeClients", val)}
+                unit="clients"
+                min={FIELD_LIMITS.activeClients.min}
+                max={FIELD_LIMITS.activeClients.max}
+                error={results.validations.activeClients.error}
+                warning={results.validations.activeClients.warning}
+                helperText="Total active client relationships maintained."
+              />
+
+              <InputField
+                id="docRequestsPerClient"
+                label="Document requests per client"
+                value={inputs.docRequestsPerClient}
+                onChange={(val) =>
+                  handleInputChange("docRequestsPerClient", val)
+                }
+                unit="requests"
+                min={FIELD_LIMITS.docRequestsPerClient.min}
+                max={FIELD_LIMITS.docRequestsPerClient.max}
+                error={results.validations.docRequestsPerClient.error}
+                warning={results.validations.docRequestsPerClient.warning}
+                helperText="Recurring document requests per client each year."
+              />
+
+              <InputField
+                id="minutesPerDocRequest"
+                label="Minutes per document request"
+                value={inputs.minutesPerDocRequest}
+                onChange={(val) =>
+                  handleInputChange("minutesPerDocRequest", val)
+                }
+                unit="min"
+                min={FIELD_LIMITS.minutesPerDocRequest.min}
+                max={FIELD_LIMITS.minutesPerDocRequest.max}
+                error={results.validations.minutesPerDocRequest.error}
+                warning={results.validations.minutesPerDocRequest.warning}
+                helperText="Preparing, checking, and filing each request. Leave out follow-up time; it is counted separately."
+              />
+
+              <InputField
+                id="followUpsPerRequest"
+                label="Follow-ups per request"
+                value={inputs.followUpsPerRequest}
+                onChange={(val) =>
+                  handleInputChange("followUpsPerRequest", val)
+                }
+                unit="per request"
+                min={FIELD_LIMITS.followUpsPerRequest.min}
+                max={FIELD_LIMITS.followUpsPerRequest.max}
+                error={results.validations.followUpsPerRequest.error}
+                warning={results.validations.followUpsPerRequest.warning}
+                helperText="Average reminders or chase messages sent per request."
+              />
+
+              <div className="sm:col-span-1">
+                <InputField
+                  id="minutesPerFollowUp"
+                  label="Minutes per follow-up"
+                  value={inputs.minutesPerFollowUp}
+                  onChange={(val) =>
+                    handleInputChange("minutesPerFollowUp", val)
+                  }
+                  unit="min"
+                  min={FIELD_LIMITS.minutesPerFollowUp.min}
+                  max={FIELD_LIMITS.minutesPerFollowUp.max}
+                  error={results.validations.minutesPerFollowUp.error}
+                  warning={results.validations.minutesPerFollowUp.warning}
+                  helperText="Average staff time spent on one follow-up."
                 />
-              </svg>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h1 className="flex items-center gap-1.5 text-sm sm:text-base font-semibold tracking-tight text-slate-900 leading-snug">
-                Savings &amp; Capacity Overview
-                <span
-                  className="inline-flex items-center justify-center w-4 h-4 rounded-md border border-slate-300 text-[10px] text-slate-600 font-bold"
-                  role="img"
-                  aria-label="Model Overview"
-                  title="Model Overview"
-                >
-                  i
+          </div>
+
+          {/* Group 3: Staff cost */}
+          <div className="bg-slate-50/70 border border-slate-200/70 rounded-xl p-4 sm:p-5 space-y-4">
+            <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#0C74BC]" />
+              Staff cost
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+              <InputField
+                id="hourlyRate"
+                label="Fully loaded staff cost per hour"
+                value={inputs.hourlyRate}
+                onChange={(val) => handleInputChange("hourlyRate", val)}
+                prefix="$"
+                unit="/ hr"
+                min={FIELD_LIMITS.hourlyRate.min}
+                max={FIELD_LIMITS.hourlyRate.max}
+                error={results.validations.hourlyRate.error}
+                warning={results.validations.hourlyRate.warning}
+                helperText="Hourly pay plus employment overhead such as benefits and payroll taxes."
+              />
+            </div>
+          </div>
+
+          {/* Group 4: Automation assumption */}
+          <AutomationSlider
+            id="automationPercentage"
+            label="Illustrative automation assumption"
+            value={inputs.automationPercentage}
+            onChange={(val) =>
+              handleInputChange("automationPercentage", val)
+            }
+            error={results.validations.automationPercentage.error}
+            warning={results.validations.automationPercentage.warning}
+            helperText="Share of the manual workload above that automation could potentially recover. This is an assumption, not a benchmark."
+          />
+        </Card>
+
+        {/* Right Column: Results Panel */}
+        <ResultsPanel
+          results={results}
+          automationPercentage={automationPercentageNum}
+          onReset={handleReset}
+          isDirty={isDirty}
+        />
+      </section>
+
+      {/* Section 3: Assumptions & Limitations (injected as Server Component) */}
+      {assumptions}
+
+      {/* Section 4: Dark Navy CTA Band */}
+      <section
+        aria-label="Action consultation banner"
+        className="rounded-2xl bg-[#0B1528] p-6 sm:p-8 lg:p-10 text-white relative overflow-hidden shadow-xl border border-slate-800"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 85% 15%, rgba(12, 116, 188, 0.28), transparent 45%), radial-gradient(circle at 15% 85%, rgba(6, 182, 212, 0.18), transparent 50%), radial-gradient(circle at 50% 50%, rgba(12, 116, 188, 0.12), transparent 60%)",
+        }}
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 relative z-10">
+          {/* Left: Headline & Copy */}
+          <div className="max-w-xl space-y-3">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-display text-white tracking-tight">
+              Ready to recover those hours?
+            </h2>
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed">
+              Discover where manual tasks are slowing you down. Get a tailored
+              workflow assessment from White Code Labs.
+            </p>
+          </div>
+
+          {/* Right: Glass stats card */}
+          <div className="w-full lg:max-w-md rounded-xl border border-white/20 bg-white/10 backdrop-blur-md p-5 sm:p-6 space-y-4 shadow-inner">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="block text-xs text-white/70 font-medium">
+                  Hours recovered
                 </span>
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
-                Quantify baseline staff hours spent across client intake,
-                document collection, and reminder follow-ups, and model
-                potential labor-cost value and capacity recoverable through
-                automated workflows.
-              </p>
+                <div className="mt-1 text-2xl sm:text-3xl font-bold font-display text-white tabular-nums leading-tight">
+                  {formatHours(results.hoursRecoveredYear)}
+                </div>
+                <span className="block text-xs text-white/60 mt-0.5">
+                  Hours / Year
+                </span>
+              </div>
+
+              <div>
+                <span className="block text-xs text-emerald-300 font-semibold uppercase tracking-wide">
+                  Labor-cost value
+                </span>
+                <div className="mt-1 text-2xl sm:text-3xl font-bold font-display text-emerald-400 tabular-nums leading-tight">
+                  {formatCurrency(results.potentialLaborCostValue)}
+                </div>
+                <span className="block text-xs text-white/60 mt-0.5">
+                  Per Year
+                </span>
+              </div>
             </div>
-          </div>
-        </header>
 
-        {/* Main 12-column responsive layout: 7 cols inputs / 5 cols results on lg */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8">
-          {/* Left column: Inputs (7 columns on desktop) */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
-            {/* Card 1: Client Onboarding Operations */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Client Intake &amp; Onboarding</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                  <InputField
-                    id="newClients"
-                    label="New Clients per Year"
-                    value={inputs.newClients}
-                    onChange={(val) => handleInputChange("newClients", val)}
-                    min={FIELD_LIMITS.newClients.min}
-                    max={FIELD_LIMITS.newClients.max}
-                    error={results.validations.newClients.error}
-                    warning={results.validations.newClients.warning}
-                    helperText={
-                      results.validations.newClients.helper ||
-                      "Annual newly onboarded volume"
-                    }
-                  />
+            <p className="text-[11px] text-white/70 leading-tight">
+              Potential, illustrative estimate based on your inputs. Not a
+              verified result.
+            </p>
 
-                  <InputField
-                    id="onboardingMinutes"
-                    label="Minutes per Onboarding"
-                    value={inputs.onboardingMinutes}
-                    onChange={(val) =>
-                      handleInputChange("onboardingMinutes", val)
-                    }
-                    min={FIELD_LIMITS.onboardingMinutes.min}
-                    max={FIELD_LIMITS.onboardingMinutes.max}
-                    error={results.validations.onboardingMinutes.error}
-                    warning={results.validations.onboardingMinutes.warning}
-                    helperText={
-                      results.validations.onboardingMinutes.helper ||
-                      "Staff time per new client file"
-                    }
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card 2: Document Requests & Follow-ups */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Document Requests &amp; Follow-ups</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                  <InputField
-                    id="activeClients"
-                    label="Active Clients Managed"
-                    value={inputs.activeClients}
-                    onChange={(val) => handleInputChange("activeClients", val)}
-                    min={FIELD_LIMITS.activeClients.min}
-                    max={FIELD_LIMITS.activeClients.max}
-                    error={results.validations.activeClients.error}
-                    warning={results.validations.activeClients.warning}
-                    helperText={
-                      results.validations.activeClients.helper ||
-                      "Total active client book"
-                    }
-                  />
-
-                  <InputField
-                    id="docRequestsPerClient"
-                    label="Requests per Client / Year"
-                    value={inputs.docRequestsPerClient}
-                    onChange={(val) =>
-                      handleInputChange("docRequestsPerClient", val)
-                    }
-                    min={FIELD_LIMITS.docRequestsPerClient.min}
-                    max={FIELD_LIMITS.docRequestsPerClient.max}
-                    error={results.validations.docRequestsPerClient.error}
-                    warning={results.validations.docRequestsPerClient.warning}
-                    helperText={
-                      results.validations.docRequestsPerClient.helper ||
-                      "Document campaigns/yr"
-                    }
-                  />
-
-                  <InputField
-                    id="minutesPerDocRequest"
-                    label="Minutes per Request"
-                    value={inputs.minutesPerDocRequest}
-                    onChange={(val) =>
-                      handleInputChange("minutesPerDocRequest", val)
-                    }
-                    min={FIELD_LIMITS.minutesPerDocRequest.min}
-                    max={FIELD_LIMITS.minutesPerDocRequest.max}
-                    error={results.validations.minutesPerDocRequest.error}
-                    warning={results.validations.minutesPerDocRequest.warning}
-                    helperText={
-                      results.validations.minutesPerDocRequest.helper ||
-                      "Preparation & intake review"
-                    }
-                  />
-
-                  <InputField
-                    id="followUpsPerRequest"
-                    label="Follow-ups per Request"
-                    value={inputs.followUpsPerRequest}
-                    onChange={(val) =>
-                      handleInputChange("followUpsPerRequest", val)
-                    }
-                    min={FIELD_LIMITS.followUpsPerRequest.min}
-                    max={FIELD_LIMITS.followUpsPerRequest.max}
-                    error={results.validations.followUpsPerRequest.error}
-                    warning={results.validations.followUpsPerRequest.warning}
-                    helperText={
-                      results.validations.followUpsPerRequest.helper ||
-                      "Average chase messages sent"
-                    }
-                  />
-
-                  <InputField
-                    id="minutesPerFollowUp"
-                    label="Minutes per Follow-up"
-                    value={inputs.minutesPerFollowUp}
-                    onChange={(val) =>
-                      handleInputChange("minutesPerFollowUp", val)
-                    }
-                    min={FIELD_LIMITS.minutesPerFollowUp.min}
-                    max={FIELD_LIMITS.minutesPerFollowUp.max}
-                    error={results.validations.minutesPerFollowUp.error}
-                    warning={results.validations.minutesPerFollowUp.warning}
-                    helperText={
-                      results.validations.minutesPerFollowUp.helper ||
-                      "Drafting, sending, tracking status"
-                    }
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Card 3: Economic Assumptions & Automation Scope */}
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  Labor Economics &amp; Automation Assumption
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 items-start">
-                  <InputField
-                    id="hourlyRate"
-                    label="Blended Hourly Rate"
-                    value={inputs.hourlyRate}
-                    onChange={(val) => handleInputChange("hourlyRate", val)}
-                    prefix="$"
-                    min={FIELD_LIMITS.hourlyRate.min}
-                    max={FIELD_LIMITS.hourlyRate.max}
-                    error={results.validations.hourlyRate.error}
-                    warning={results.validations.hourlyRate.warning}
-                    helperText={
-                      results.validations.hourlyRate.helper ||
-                      "Fully loaded staff cost"
-                    }
-                  />
-
-                  <AutomationSlider
-                    id="automationPercentage"
-                    label="Automation Assumption (%)"
-                    value={inputs.automationPercentage}
-                    onChange={(val) =>
-                      handleInputChange("automationPercentage", val)
-                    }
-                    error={results.validations.automationPercentage.error}
-                    warning={results.validations.automationPercentage.warning}
-                    helperText={
-                      results.validations.automationPercentage.helper ||
-                      "Illustrative estimate, not an industry benchmark"
-                    }
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right column: Results Panel (5 columns on desktop) */}
-          <div className="lg:col-span-5">
-            <ResultsPanel
-              results={results}
-              onOpenConsultation={() => setIsConsultationOpen(true)}
-              onReset={handleReset}
-              isDirty={isDirty}
-            />
+            <button
+              type="button"
+              onClick={() => setIsConsultationOpen(true)}
+              className="w-full py-3.5 px-6 rounded-full bg-[#0C74BC] hover:bg-[#0A62A0] text-white font-bold text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0C74BC]"
+            >
+              Discuss your results
+            </button>
           </div>
         </div>
-      </main>
+      </section>
 
       {/* Consultation Modal */}
       <ConsultationModal
@@ -293,9 +311,10 @@ export const Calculator: React.FC = () => {
           potentialLaborCostValue: results.potentialLaborCostValue,
           hoursRecoveredYear: results.hoursRecoveredYear,
           weeklyHoursRecovered: results.weeklyHoursRecovered,
-          automationPercentage: Number(inputs.automationPercentage) || 0,
+          automationPercentage: automationPercentageNum,
         }}
       />
     </div>
   );
 };
+

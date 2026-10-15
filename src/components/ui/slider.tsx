@@ -26,10 +26,10 @@ const Slider = React.forwardRef<
     {...props}
   >
     <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-md bg-slate-200">
-      <SliderPrimitive.Range className="absolute h-full rounded-md bg-blue-600" />
+      <SliderPrimitive.Range className="absolute h-full rounded-md bg-[#0C74BC]" />
     </SliderPrimitive.Track>
     <SliderPrimitive.Thumb
-      className="block h-4 w-4 rounded-md border-2 border-blue-600 bg-white shadow-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+      className="block h-4 w-4 rounded-md border-2 border-[#0C74BC] bg-white shadow-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0C74BC] focus-visible:ring-offset-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50"
       aria-label={props["aria-label"]}
     />
   </SliderPrimitive.Root>

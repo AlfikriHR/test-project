@@ -21,7 +21,7 @@ const DialogOverlay = React.forwardRef<
     <DialogPrimitive.Overlay
       ref={ref}
       className={cn(
-        "bg-slate-900/40 backdrop-blur-xs fixed inset-0 z-50 transition-opacity",
+        "bg-ink/60 backdrop-blur-xs fixed inset-0 z-50 transition-opacity",
         className
       )}
       {...props}
@@ -39,13 +39,16 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-md border border-slate-200/60 bg-white p-4 sm:p-6 sm:p-8 shadow-2xl ring-1 ring-slate-900/10 focus:outline-none",
+        "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-line bg-surface p-6 sm:p-8 shadow-2xl focus:outline-none",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer" aria-label="Close dialog">
+      <DialogPrimitive.Close
+        className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:bg-paper hover:text-ink focus:outline-none focus:ring-2 focus:ring-brand cursor-pointer"
+        aria-label="Close dialog"
+      >
         <svg
           className="h-5 w-5"
           xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +101,7 @@ const DialogTitle = React.forwardRef<
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-xl font-bold tracking-tight text-slate-900 sm:text-2xl",
+      "text-xl font-bold font-display tracking-tight text-ink sm:text-2xl",
       className
     )}
     {...props}
@@ -112,7 +115,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-xs text-slate-600 sm:text-sm", className)}
+    className={cn("text-xs text-muted sm:text-sm leading-relaxed", className)}
     {...props}
   />
 ));
